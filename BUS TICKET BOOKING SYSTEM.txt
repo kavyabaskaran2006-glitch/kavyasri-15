@@ -1,0 +1,127 @@
+-- Create Database
+CREATE DATABASE bus_booking;
+USE bus_booking;
+
+-- USERS TABLE
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(100),
+    phone VARCHAR(15)
+);
+
+-- BUSES TABLE
+CREATE TABLE buses (
+    bus_id INT PRIMARY KEY AUTO_INCREMENT,
+    bus_name VARCHAR(100),
+    source VARCHAR(50),
+    destination VARCHAR(50),
+    total_seats INT
+);
+
+
+
+-- SCHEDULE TABLE
+CREATE TABLE schedules (
+    schedule_id INT PRIMARY KEY AUTO_INCREMENT,
+    bus_id INT,
+    travel_date DATE,
+    departure_time TIME,
+    arrival_time TIME,
+    fare DECIMAL(10,2),
+    FOREIGN KEY (bus_id) REFERENCES buses(bus_id)
+);
+
+-- BOOKINGS TABLE
+CREATE TABLE bookings (
+    booking_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    schedule_id INT,
+    seats_booked INT,
+    booking_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id)
+);
+
+
+
+
+-- PAYMENTS TABLE
+CREATE TABLE payments (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    booking_id INT,
+    amount DECIMAL(10,2),
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    payment_status VARCHAR(20),
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+);
+
+-------------------------------------------------------
+-- INSERT SAMPLE DATA
+-------------------------------------------------------
+
+-- Users
+INSERT INTO users (name, email, password, phone)
+VALUES ('Kavya Sri', 'kavya@gmail.com', '1234', '9876543210');
+
+-- Buses
+INSERT INTO buses (bus_name, source, destination, total_seats)
+VALUES ('Express Bus', 'Chennai', 'Trichy', 40);
+
+-- Schedule
+INSERT INTO schedules (bus_id, travel_date, departure_time, arrival_time, fare)
+VALUES (1, '2026-04-10', '10:00:00', '14:00:00', 500);
+
+-- Booking
+INSERT INTO bookings (user_id, schedule_id, seats_booked, status)
+VALUES (1, 1, 2, 'CONFIRMED');
+
+-- Payment
+INSERT INTO payments (booking_id, amount, payment_status)
+VALUES (1, 1000, 'SUCCESS');
+
+-------------------------------------------------------
+-- QUERIES (OPERATIONS)
+-------------------------------------------------------
+
+-- Login
+SELECT * FROM users
+WHERE email = 'kavya@gmail.com' AND password = '1234';
+
+-- Search Bus
+SELECT b.bus_name, s.travel_date, s.departure_time, s.fare
+FROM buses b
+JOIN schedules s ON b.bus_id = s.bus_id
+WHERE b.source = 'Chennai' AND b.destination = 'Trichy';
+
+-- View Booking
+SELECT u.name, b.booking_id, b.seats_booked, b.status
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id;
+
+-- Seat Availability
+SELECT 
+    b.total_seats - IFNULL(SUM(book.seats_booked), 0) AS available_seats
+FROM buses b
+JOIN schedules s ON b.bus_id = s.bus_id
+LEFT JOIN bookings book 
+ON s.schedule_id = book.schedule_id AND book.status = 'CONFIRMED'
+WHERE s.schedule_id = 1
+GROUP BY b.total_seats;
+
+-- Cancel Ticket
+UPDATE bookings
+SET status = 'CANCELLED'
+WHERE booking_id = 1;
+
+-- View Payments
+SELECT p.payment_id, p.amount, p.payment_status
+FROM payments p;
+
+-- Admin View
+SELECT u.name, b.booking_id, b.status, s.travel_date
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id
+JOIN schedules s ON b.schedule_id = s.schedule_id;

@@ -1,0 +1,13 @@
+import java.util.*;
+class RemoveDuplicateHashset{
+    public static void main(String[] args){
+        ArrayList<Integer>n=new ArrayList<>();
+        n.add(10); n.add(20); n.add(40); n.add(30); n.add(10); n.add(30);
+        HashSet<Integer>unique=new HashSet<>(n);
+        System.out.println(unique);
+        LinkedHashSet<Integer>a=new LinkedHashSet<>(n);
+        System.out.println(a);
+        TreeSet<Integer>b=new TreeSet<>(n);
+        System.out.println(b);
+    }
+}

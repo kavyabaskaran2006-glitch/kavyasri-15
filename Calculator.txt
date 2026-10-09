@@ -1,0 +1,23 @@
+class calculator{
+    public static void main(String[] args){
+        calc c1=new calc();
+        c1.display();
+    }
+}
+class calc{
+    int add(int a,int b){
+        return a+b;
+    }
+    int sub(int a,int b){
+        return a-b;
+    }
+    int mul(int a,int b){
+        return a*b;
+    }
+    int div(int a,int b){
+        return a/b;
+    }
+    void display(){
+        System.out.println("Add: "+add(5,5)+"Subtract: "+sub(5,5)+"Multiply: "+mul(5,5)+"Divide: "+div(5,5));
+    }
+}
